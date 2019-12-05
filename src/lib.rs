@@ -47,9 +47,26 @@ struct Node<T> {
     parent: Option<Rc<Node<T>>>
 }
 
+// This simulates the work performed when we enter a GC. The stack scanner
+// checks hundreds of stack words against possibly thousands of blocks on the
+// heap. 400k iterations is used to hammer-home the point, but it isn't too
+// far-fetched.
+fn computationally_expensive() {
+    println!("Entering expensive function...");
+    let mut c: Vec<usize> = vec![];
+    for i in 0..(400_000) {
+            c.push(1);
+    }
+
+    // We do this part to ensure that the loop isn't optimised away.
+    let sum = c.iter().fold(0, | acc, x| acc + x);
+    println!("{:?}", sum);
+}
+
 impl<T> Cactus<T> {
     /// Return an empty cactus stack node.
     pub fn new() -> Cactus<T> {
+        computationally_expensive();
         Cactus{node: None}
     }
 
